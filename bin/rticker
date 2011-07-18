@@ -1,0 +1,6 @@
+#!/usr/bin/env ruby -w
+
+require 'rticker/application'
+
+application = RTicker::Application.new(ARGV)
+application.run
