@@ -1,0 +1,3 @@
+rticker is a command line-based stock ticker application capable of
+retrieving and displaying information about stocks, futures, currency
+pairs, and option contracts.
