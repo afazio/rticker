@@ -1,0 +1,12 @@
+;; Show all ticker entries
+;; An entry starting with an @ sign represents an include directive.
+
+@equities.ticker
+--
+@options.ticker
+--
+@indexes.ticker
+--
+@commodities.ticker
+--
+@currencies.ticker

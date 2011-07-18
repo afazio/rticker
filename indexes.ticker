@@ -1,0 +1,14 @@
+; Any entry starting with a caret (^) will be fetched from Yahoo.
+; Otherwise the entry is fetched from Google, which is closer to
+; realtime.
+
+; A description of the ticker symbol can be supplied after a comma.
+
+*.DJI,DJIA
+.INX,S&P 500
+.FTSE,FTSE.100
+.HSI,HangSeng
+SHA:000001,Shanghai
+.N225,Nikkei 225
+^^AXJO,S&P/ASX 200
+^^VIX,Volatility Index

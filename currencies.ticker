@@ -1,0 +1,7 @@
+; Currency pairs must be preceded by a dollar sign
+
+*$EURUSD,EUR/USD
+$GBPUSD,GBP/USD
+$USDCHF,USD/CHF
+$USDJPY,USD/JPY
+$USDAUD,USD/AUD

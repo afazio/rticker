@@ -1,0 +1,7 @@
+; Commodities are preceded by a pound sign.
+*#CL.NYM,Oil
+#KC.NYB,Coffee
+#GC.CMX,Gold
+#SI.CMX,Silver
+#SB.NYB,Sugar
+*#YW.CBT,Wheat

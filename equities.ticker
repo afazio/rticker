@@ -1,0 +1,13 @@
+;; An entry preceded with an asterisk will be displayed in bold.
+
+AAPL
+
+;; If you own google, list the amount of shares you own and the average
+;; cost of those shares with the format COUNT@PRICE.  Use a negative
+;; count for short positions.
+
+;; I wish I bought 100 shares of GOOG at $300!
+GOOG
+MSFT
+*MT
+*SLX
