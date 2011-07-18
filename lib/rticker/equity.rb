@@ -54,7 +54,7 @@ module RTicker
       symbols = entries.map { |e| e.symbol }
       uri = "http://download.finance.yahoo.com/d/quotes.csv?s=%s&f=l1c1va2xj1b4j4dyekjm3m4rr5p5p6s7" % symbols.join(",")
       response = Net::HTTP.get(URI.parse(URI.escape uri)) rescue return
-      #return if response =~ /=/ # This is a sign yahoo is giving us bad info
+      return if response =~ /=/ # This is a sign yahoo is giving us bad info
       results = response.split("\n")
       entries.zip(results) do |entry, result|
         # Yahoo uses A CSV format.
