@@ -38,8 +38,6 @@ module RTicker
           rescue Exception => e
             # These results aren't available from about 9am to 9:30am.
             # Yahoo's results are often 20-30 minutes behind.
-            puts e.message
-            exit
             Thread.current.exit
           end
           if (bid.to_f != entry.bid or ask.to_f != entry.ask) and not entry.bid.nil?
