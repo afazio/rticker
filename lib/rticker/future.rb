@@ -1,6 +1,7 @@
 require 'rticker/entry'
 require 'net/http'
 require 'uri'
+require 'cgi'
 
 module RTicker
 
@@ -38,12 +39,20 @@ module RTicker
       # brute force to find the answer.  When we find the spot contract, we
       # set the entry's real_symbol attribute to the actual spot contract's
       # symbol.  Got it?
+
+      # Since variables are shared in block closures, a simple for loop
+      # won't do.  We must create a new Proc to eliminate sharing of the
+      # entry variable.
+      go = Proc.new do |entry|
+        Thread.new { entry.determine_spot_contract }
+      end
+
       if entries.any? {|e| e.real_symbol.nil?}
         #puts "Please wait... determining spot contracts"
         threads = []
         for entry in entries
           if not entry.real_symbol
-            threads << Thread.new { entry.determine_spot_contract }
+            threads << go.call(entry)
           end
         end
         threads.each {|t| t.join}
@@ -52,21 +61,21 @@ module RTicker
       # All spot contracts have been found.  Now let's update our entries
       # with the latest price information.  This is what we came here for!
       symbols = entries.map { |e| e.real_symbol }
-      uri = "http://download.finance.yahoo.com/d/quotes.csv?s=%s&f=l1c1va2xj1b4j4dyekjm3m4rr5p5p6s7" % symbols.join(",")
-      response = Net::HTTP.get(URI.parse(URI.escape uri)) rescue return
+      uri = "http://download.finance.yahoo.com/d/quotes.csv?s=%s&f=l1c1va2xj1b4j4dyekjm3m4rr5p5p6s7" % CGI.escape(symbols.join(","))
+      response = Net::HTTP.get(URI.parse uri) rescue return
       results = response.split("\n")
-      entries.zip(results) do |entry, result|
+      entries.zip(results) do |_entry, result|
         # Yahoo uses A CSV format.
         fields = result.split(",")
         return if fields[4] == '""' # This is a sign yahoo is giving us bad info
         price  = fields[0]
         change = fields[1]
-        if price.to_f != entry.curr_value and not entry.curr_value.nil?
+        if price.to_f != _entry.curr_value and not _entry.curr_value.nil?
           # The price has changed
-          entry.last_changed = Time.now() 
+          _entry.last_changed = Time.now() 
         end
-        entry.curr_value  = price.to_f
-        entry.start_value = entry.curr_value - change.to_f
+        _entry.curr_value  = price.to_f
+        _entry.start_value = _entry.curr_value - change.to_f
       end
     end # def
 
@@ -92,8 +101,8 @@ module RTicker
         month_symbol = Future::COMMODITY_MONTHS[curr_month]
         year_symbol = curr_year % 100 # Only want last two digits of year.
         real_symbol_attempt = "#{symbol}#{month_symbol}#{year_symbol}.#{exchange}"
-        uri = "http://download.finance.yahoo.com/d/quotes.csv?s=%s&f=l1c1va2xj1b4j4dyekjm3m4rr5p5p6s7" % real_symbol_attempt
-        response = Net::HTTP.get(URI.parse(URI.escape uri)) rescue return
+        uri = "http://download.finance.yahoo.com/d/quotes.csv?s=%s&f=l1c1va2xj1b4j4dyekjm3m4rr5p5p6s7" % CGI::escape(real_symbol_attempt)
+        response = Net::HTTP.get(URI.parse uri) rescue return
 
         # This contract is only valid if the response doesn't start with
         # 0.00.  A commodity is never worth nothing!

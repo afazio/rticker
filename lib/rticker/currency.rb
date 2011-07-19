@@ -1,6 +1,7 @@
 require 'rticker/entry'
 require 'net/http'
 require 'uri'
+require 'cgi'
 
 module RTicker
 
@@ -18,8 +19,9 @@ module RTicker
 
     def Currency.update (entries)
       symbols = entries.map { |e| e.symbol }
-      uri = "http://download.finance.yahoo.com/d/quotes.csv?s=%s&f=sl1d1t1ba&e=.csv" % symbols.map{|x| x+"=X"}.join(",")
-      response = Net::HTTP.get(URI.parse(URI.escape uri)) rescue return
+      uri_param = symbols.map{|x| x+"=X"}.join(",")
+      uri = "http://download.finance.yahoo.com/d/quotes.csv?s=%s&f=sl1d1t1ba&e=.csv" % CGI::escape(uri_param)
+      response = Net::HTTP.get(URI.parse uri) rescue return
       return if response =~ /"N\/A"/ # Yahoo sometimes returns bogus info.
       results = response.split("\n")
       entries.zip(results) do |entry, result|

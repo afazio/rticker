@@ -1,6 +1,7 @@
 require 'rticker/entry'
 require 'net/http'
 require 'uri'
+require 'cgi'
 
 module RTicker
 
@@ -31,16 +32,16 @@ module RTicker
 
     def Equity.update_google (entries)
       symbols = entries.map { |e| e.symbol }
-      uri = "http://www.google.com/finance/info?client=ig&q=%s" % symbols.join(",")
-      response = Net::HTTP.get(URI.parse(URI.escape uri)) rescue return
+      uri = "http://www.google.com/finance/info?client=ig&q=%s" % CGI::escape(symbols.join(","))
+      response = Net::HTTP.get(URI.parse uri) rescue return
       return if response =~ /illegal/ # Google didn't like our request.
       results = response.split("{")[1..-1]
       entries.zip(results) do |entry, result|
         # Fish out the info we want.  Could use a JSON library, but that's
         # one more gem that would be required of the user to install.  Opted
-        # instead for just two lines of super ugly code.
-        price  = result.grep(/"l"/)[0].chomp.split(":")[-1].split('"')[-1].tr(',', '')
-        change = result.grep(/"c"/)[0].chomp.split(":")[-1].split('"')[-1].tr(',', '')
+        # instead to just use some ugly regexs
+        price =  /,"l" : "([^"]*)"/.match(result)[1]
+        change = /,"c" : "([^"]*)"/.match(result)[1]
         if price.to_f != entry.curr_value and not entry.curr_value.nil?
           # The price has changed
           entry.last_changed = Time.now() 
@@ -52,8 +53,8 @@ module RTicker
 
     def Equity.update_yahoo (entries)
       symbols = entries.map { |e| e.symbol }
-      uri = "http://download.finance.yahoo.com/d/quotes.csv?s=%s&f=l1c1va2xj1b4j4dyekjm3m4rr5p5p6s7" % symbols.join(",")
-      response = Net::HTTP.get(URI.parse(URI.escape uri)) rescue return
+      uri = "http://download.finance.yahoo.com/d/quotes.csv?s=%s&f=l1c1va2xj1b4j4dyekjm3m4rr5p5p6s7" % CGI::escape(symbols.join(","))
+      response = Net::HTTP.get(URI.parse uri) rescue return
       return if response =~ /=/ # This is a sign yahoo is giving us bad info
       results = response.split("\n")
       entries.zip(results) do |entry, result|
