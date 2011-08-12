@@ -38,6 +38,7 @@ module RTicker
       response = Net::HTTP.get(URI.parse uri) rescue return
       return if response =~ /illegal/ # Google didn't like our request.
       results = response.split("{")[1..-1]
+      return if results.nil?
       entries.zip(results) do |entry, result|
         # Fish out the info we want.  Could use a JSON library, but that's
         # one more gem that would be required of the user to install.  Opted
