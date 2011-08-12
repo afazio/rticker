@@ -18,7 +18,9 @@ module RTicker
     # of -1000 would mean that 1000 euros were swapped for $1,412 USD.
 
     def Currency.update (entries)
-      symbols = entries.map { |e| e.symbol }
+      # Strip out anything from symbol that is not an uppercase character
+      # This allows the user to freely use USD/EUR or USD.EUR, etc.
+      symbols = entries.map { |e| e.symbol.tr("^A-Z", "") }
       uri_param = symbols.map{|x| x+"=X"}.join(",")
       uri = "http://download.finance.yahoo.com/d/quotes.csv?s=%s&f=sl1d1t1ba&e=.csv" % CGI::escape(uri_param)
       response = Net::HTTP.get(URI.parse uri) rescue return
