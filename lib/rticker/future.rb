@@ -61,7 +61,7 @@ module RTicker
       # All spot contracts have been found.  Now let's update our entries
       # with the latest price information.  This is what we came here for!
       symbols = entries.map { |e| e.real_symbol }
-      uri = "http://download.finance.yahoo.com/d/quotes.csv?s=%s&f=l1c1va2xj1b4j4dyekjm3m4rr5p5p6s7" % CGI.escape(symbols.join(","))
+      uri = "http://download.finance.yahoo.com/d/quotes.csv?s=%s&f=l1c1d1va2xj1b4j4dyekjm3m4rr5p5p6s7" % CGI.escape(symbols.join(","))
       response = Net::HTTP.get(URI.parse uri) rescue return
       results = response.split("\n")
       entries.zip(results) do |_entry, result|
@@ -70,6 +70,8 @@ module RTicker
         return if fields[4] == '""' # This is a sign yahoo is giving us bad info
         price  = fields[0]
         change = fields[1]
+        last_date = fields[2]
+        return if Date.strptime(last_date, '"%m/%d/%Y"') != Date.today
         if price.to_f != _entry.curr_value and not _entry.curr_value.nil?
           # The price has changed
           _entry.last_changed = Time.now() 

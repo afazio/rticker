@@ -28,6 +28,8 @@ module RTicker
         # Yahoo uses A CSV format.
         fields = result.split(",")
         price = fields[1]
+        last_date = fields[2]
+        return if Date.strptime(last_date, '"%m/%d/%Y"') != Date.today
         if price.to_f != entry.curr_value and not entry.curr_value.nil?
           # The price has changed
           entry.last_changed = Time.now() 

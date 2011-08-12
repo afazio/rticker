@@ -2,6 +2,8 @@ require 'rticker/entry'
 require 'net/http'
 require 'uri'
 require 'cgi'
+require 'rational'
+require 'date'
 
 module RTicker
 
@@ -40,8 +42,8 @@ module RTicker
         # Fish out the info we want.  Could use a JSON library, but that's
         # one more gem that would be required of the user to install.  Opted
         # instead to just use some ugly regexs
-        price =  /,"l" : "([^"]*)"/.match(result)[1]
-        change = /,"c" : "([^"]*)"/.match(result)[1]
+        price =  /,"l" : "([^"]*)"/.match(result)[1].tr(",", "")
+        change = /,"c" : "([^"]*)"/.match(result)[1].tr(",", "")
         if price.to_f != entry.curr_value and not entry.curr_value.nil?
           # The price has changed
           entry.last_changed = Time.now() 
@@ -53,15 +55,16 @@ module RTicker
 
     def Equity.update_yahoo (entries)
       symbols = entries.map { |e| e.symbol }
-      uri = "http://download.finance.yahoo.com/d/quotes.csv?s=%s&f=l1c1va2xj1b4j4dyekjm3m4rr5p5p6s7" % CGI::escape(symbols.join(","))
+      uri = "http://download.finance.yahoo.com/d/quotes.csv?s=%s&f=l1c1d1va2xj1b4j4dyekjm3m4rr5p5p6s7" % CGI::escape(symbols.join(","))
       response = Net::HTTP.get(URI.parse uri) rescue return
-      return if response =~ /=/ # This is a sign yahoo is giving us bad info
       results = response.split("\n")
       entries.zip(results) do |entry, result|
         # Yahoo uses A CSV format.
         fields = result.split(",")
         price  = fields[0]
         change = fields[1]
+        last_date = fields[2]
+        return if Date.strptime(last_date, '"%m/%d/%Y"') != Date.today
         if price.to_f != entry.curr_value and not entry.curr_value.nil?
           # The price has changed
           entry.last_changed = Time.now() 
