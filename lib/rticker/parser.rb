@@ -1,4 +1,5 @@
 require 'rticker/types'
+require 'pathname'
 
 module RTicker
   
@@ -15,6 +16,11 @@ module RTicker
 
     # If we're not dealing with a readable source then get out of here
     return [] if file != "-" and not File.readable? file
+
+    if File.symlink? file
+      # Follow symlinks so that we can honor relative include directives
+      return read_entry_file(Pathname.new(file).realpath.to_s)
+    end
     
     entries = []
     source = if file == "-" then $stdin else File.open(file) end
