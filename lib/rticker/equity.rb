@@ -43,8 +43,8 @@ module RTicker
         # Fish out the info we want.  Could use a JSON library, but that's
         # one more gem that would be required of the user to install.  Opted
         # instead to just use some ugly regexs
-        price =  /,"l" : "([^"]*)"/.match(result)[1].tr(",", "")
-        change = /,"c" : "([^"]*)"/.match(result)[1].tr(",", "")
+        price =  /,"l" : "([^"]*)"/.match(result)[1].tr(",", "") rescue return
+        change = /,"c" : "([^"]*)"/.match(result)[1].tr(",", "") rescue return
         if price.to_f != entry.curr_value and not entry.curr_value.nil?
           # The price has changed
           entry.last_changed = Time.now() 
