@@ -25,7 +25,7 @@ module RTicker
     def parse! (args)
       # Use OptionParser to parse command line arguments
       OptionParser.new do |opts|
-        opts.banner = "Usage: rticker [-oenh] [-f FILE] ... [SYMBOL[,DESC[,COUNT@PRICE]]] ..."
+        opts.banner = "Usage: rticker [-onh] [-d SECS] [-f FILE] ... [SYMBOL[,DESC[,COUNT@PRICE]]] ..."
         
         opts.on("-o", "--once", "Only display ticker results once then quit") do
           @once = true
