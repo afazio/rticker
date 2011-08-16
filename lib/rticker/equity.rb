@@ -1,6 +1,5 @@
 require 'rticker/entry'
-require 'net/http'
-require 'uri'
+require 'rticker/net'
 require 'cgi'
 require 'rational'
 require 'date'
@@ -35,7 +34,7 @@ module RTicker
     def Equity.update_google (entries)
       symbols = entries.map { |e| e.symbol }
       uri = "http://www.google.com/finance/info?client=ig&q=%s" % CGI::escape(symbols.join(","))
-      response = Net::HTTP.get(URI.parse uri) rescue return
+      response = RTicker::Net.get_response(uri) rescue return
       return if response =~ /illegal/ # Google didn't like our request.
       results = response.split("{")[1..-1]
       return if results.nil?
@@ -57,7 +56,7 @@ module RTicker
     def Equity.update_yahoo (entries)
       symbols = entries.map { |e| e.symbol }
       uri = "http://download.finance.yahoo.com/d/quotes.csv?s=%s&f=l1c1d1va2xj1b4j4dyekjm3m4rr5p5p6s7" % CGI::escape(symbols.join(","))
-      response = Net::HTTP.get(URI.parse uri) rescue return
+      response = RTicker::Net.get_response(uri) rescue return
       results = response.split("\n")
       entries.zip(results) do |entry, result|
         # Yahoo uses A CSV format.

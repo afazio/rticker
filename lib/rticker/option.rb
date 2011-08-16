@@ -1,6 +1,5 @@
 require 'rticker/entry'
-require 'net/http'
-require 'uri'
+require 'rticker/net'
 require 'cgi'
 
 module RTicker
@@ -40,7 +39,7 @@ module RTicker
     
     def Option.run_update (entry)
       uri = "http://finance.yahoo.com/q?s=%s" % CGI::escape(entry.symbol)
-      response = Net::HTTP.get(URI.parse uri) rescue Thread.current.exit
+      response = RTicker::Net.get_response(uri) rescue Thread.current.exit
       # Rake through the HTML and find the bits we want.
       # This can be a bit messy.
       begin

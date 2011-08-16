@@ -5,13 +5,14 @@ module RTicker
   class Options
 
     attr_reader :once, :no_color, :input_files
-    attr_reader :sleep, :rest
+    attr_reader :sleep, :rest, :proxy
     
     def initialize (args)
       # Defaults
       @once = false     # Only run once then quit
       @no_color = false # Don't use color when showing results to user
       @input_files = [] # Input files provided by user
+      @proxy = nil      # "host:port" proxy
       @sleep = 2        # how long to delay between web requests
       @rest = []        # The rest of the command line arguments
       parse!(args)
@@ -25,7 +26,7 @@ module RTicker
     def parse! (args)
       # Use OptionParser to parse command line arguments
       OptionParser.new do |opts|
-        opts.banner = "Usage: rticker [-onh] [-d SECS] [-f FILE] ... [SYMBOL[,DESC[,COUNT@PRICE]]] ..."
+        opts.banner = "Usage: rticker [-onh] [-d SECS] [-p host:port] [-f FILE] ... [SYMBOL[,DESC[,COUNT@PRICE]]] ..."
         
         opts.on("-o", "--once", "Only display ticker results once then quit") do
           @once = true
@@ -41,6 +42,10 @@ module RTicker
 
         opts.on("-d", "--delay SECS", "How long to delay in SECS between each update") do |secs|
           @sleep = secs.to_f
+        end
+        
+        opts.on("-p", "--proxy HOST:PORT", "Host and port of HTTP proxy to use.") do |proxy|
+          @proxy = proxy
         end
         
         opts.on("-h", "--help", "Display this screen") do 

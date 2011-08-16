@@ -55,6 +55,11 @@ module RTicker
         print RTicker::tput "cnorm" unless @options.once?
         exit
       end
+
+      # Set proxy settings
+      if @options.proxy
+        RTicker::Net.proxy = @options.proxy
+      end
       
       # Update entries via web calls until user quits via Ctrl-C
       while true

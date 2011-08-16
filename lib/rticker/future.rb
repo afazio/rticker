@@ -1,6 +1,5 @@
 require 'rticker/entry'
-require 'net/http'
-require 'uri'
+require 'rticker/net'
 require 'cgi'
 
 module RTicker
@@ -62,7 +61,7 @@ module RTicker
       # with the latest price information.  This is what we came here for!
       symbols = entries.map { |e| e.real_symbol }
       uri = "http://download.finance.yahoo.com/d/quotes.csv?s=%s&f=l1c1d1va2xj1b4j4dyekjm3m4rr5p5p6s7" % CGI.escape(symbols.join(","))
-      response = Net::HTTP.get(URI.parse uri) rescue return
+      response = RTicker::Net.get_response(uri) rescue return
       results = response.split("\n")
       entries.zip(results) do |_entry, result|
         # Yahoo uses A CSV format.
@@ -104,7 +103,7 @@ module RTicker
         year_symbol = curr_year % 100 # Only want last two digits of year.
         real_symbol_attempt = "#{symbol}#{month_symbol}#{year_symbol}.#{exchange}"
         uri = "http://download.finance.yahoo.com/d/quotes.csv?s=%s&f=l1c1va2xj1b4j4dyekjm3m4rr5p5p6s7" % CGI::escape(real_symbol_attempt)
-        response = Net::HTTP.get(URI.parse uri) rescue return
+        response = RTicker::Net.get_response(uri) rescue return
 
         # This contract is only valid if the response doesn't start with
         # 0.00.  A commodity is never worth nothing!
