@@ -5,8 +5,8 @@ require 'cgi'
 module RTicker
 
   ##############################
-  # Represents option contracts which are derivatives of either equities,
-  # indexes or futures.
+  # Represents option contracts which are derivatives of either equities or
+  # futures.
   class Option < Entry
     # Because option contracts are not traded as much as their underlying,
     # the bid/ask spread can be pretty high and there might be quite a bit of
