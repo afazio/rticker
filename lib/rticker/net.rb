@@ -20,7 +20,11 @@ module RTicker
     end
 
     def self.get_response (url)
-      return ::Net::HTTP::Proxy(@@proxy_host, @@proxy_port).get(URI.parse url)
+      begin
+        return ::Net::HTTP::Proxy(@@proxy_host, @@proxy_port).get(URI.parse url)
+      rescue Timeout::Error => e
+        return ""
+      end
     end
   end
 end
