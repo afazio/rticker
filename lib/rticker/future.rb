@@ -62,6 +62,7 @@ module RTicker
       symbols = entries.map { |e| e.real_symbol }
       uri = "http://download.finance.yahoo.com/d/quotes.csv?s=%s&f=l1c1d1va2xj1b4j4dyekjm3m4rr5p5p6s7" % CGI.escape(symbols.join(","))
       response = RTicker::Net.get_response(uri) rescue return
+      return if response.empty?
       results = response.split("\n")
       entries.zip(results) do |_entry, result|
         # Yahoo uses A CSV format.

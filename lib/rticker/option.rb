@@ -40,6 +40,8 @@ module RTicker
     def Option.run_update (entry)
       uri = "http://finance.yahoo.com/q?s=%s" % CGI::escape(entry.symbol)
       response = RTicker::Net.get_response(uri) rescue Thread.current.exit
+      Thread.current.exit if response.empty?
+
       # Rake through the HTML and find the bits we want.
       # This can be a bit messy.
       begin

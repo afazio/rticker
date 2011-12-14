@@ -23,7 +23,7 @@ module RTicker
       uri_param = symbols.map{|x| x+"=X"}.join(",")
       uri = "http://download.finance.yahoo.com/d/quotes.csv?s=%s&f=sl1d1t1ba&e=.csv" % CGI::escape(uri_param)
       response = RTicker::Net.get_response(uri) rescue return
-      return if response =~ /"N\/A"/ # Yahoo sometimes returns bogus info.
+      return if response.empty? or response =~ /"N\/A"/ # Yahoo sometimes returns bogus info.
       results = response.split("\n")
       entries.zip(results) do |entry, result|
         # Yahoo uses A CSV format.
