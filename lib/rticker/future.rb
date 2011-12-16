@@ -71,7 +71,7 @@ module RTicker
         price  = fields[0]
         change = fields[1]
         last_date = fields[2]
-        return if Date.strptime(last_date, '"%m/%d/%Y"') != Date.today
+        return if last_date.nil? or Date.strptime(last_date, '"%m/%d/%Y"') != Date.today
         if price.to_f != _entry.curr_value and not _entry.curr_value.nil?
           # The price has changed
           _entry.last_changed = Time.now() 
