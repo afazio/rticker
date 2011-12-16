@@ -2,5 +2,7 @@
 
 require 'rticker/application'
 
+Thread.abort_on_exception = true
+
 application = RTicker::Application.new(ARGV)
 application.run
