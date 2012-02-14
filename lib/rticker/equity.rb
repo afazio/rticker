@@ -61,6 +61,7 @@ module RTicker
       results = response.split("\n")
       entries.zip(results) do |entry, result|
         # Yahoo uses A CSV format.
+        return if result.nil?
         fields = result.split(",")
         price  = fields[0]
         change = fields[1]
