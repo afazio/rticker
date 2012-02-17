@@ -57,8 +57,11 @@ module RTicker
       end
 
       # Set proxy settings
+      system_proxy = RTicker::Net.detect_system_proxy
       if @options.proxy
         RTicker::Net.proxy = @options.proxy
+      elsif not system_proxy.nil? and not @options.no_proxy
+        RTicker::Net.proxy = "#{system_proxy[:host]}:#{system_proxy[:port]}"
       end
       
       # Update entries via web calls until user quits via Ctrl-C

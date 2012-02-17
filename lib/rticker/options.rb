@@ -5,7 +5,7 @@ module RTicker
   class Options
 
     attr_reader :once, :no_color, :input_files
-    attr_reader :sleep, :rest, :proxy
+    attr_reader :sleep, :rest, :proxy, :no_proxy
     
     def initialize (args)
       # Defaults
@@ -13,6 +13,7 @@ module RTicker
       @no_color = false # Don't use color when showing results to user
       @input_files = [] # Input files provided by user
       @proxy = nil      # "host:port" proxy
+      @no_proxy = false # Don't default to system proxy if one is detected
       @sleep = 2        # how long to delay between web requests
       @rest = []        # The rest of the command line arguments
       parse!(args)
@@ -44,8 +45,12 @@ module RTicker
           @sleep = secs.to_f
         end
         
-        opts.on("-p", "--proxy HOST:PORT", "Host and port of HTTP proxy to use.") do |proxy|
+        opts.on("-p", "--proxy HOST:PORT", "Host and port of HTTP proxy to use.  This overrides any system proxy that is detected.") do |proxy|
           @proxy = proxy
+        end
+        
+        opts.on("-x", "--no-proxy", "Don't default to system proxy if one is detected.") do
+          @no_proxy = true
         end
         
         opts.on("-h", "--help", "Display this screen") do 
