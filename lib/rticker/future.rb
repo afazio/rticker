@@ -14,9 +14,10 @@ module RTicker
     # ahead of time what the nearest expiration for a contract will be, we'll
     # have to figure this out for each contract with web calls.  Once we know
     # the expiration, we'll calculate the real symbol for the contract and
-    # store it in @real_symbol.
+    # store it in @real_symbol.  A future may also have an explicit amount of
+    # months forward to look.
     attr_accessor :start_value, :exp_month, :exp_year, :market
-    attr_accessor :real_symbol
+    attr_accessor :real_symbol, :forward_months
 
     # Commodities have strange codes for months
     COMMODITY_MONTHS = %w[F G H J K M N Q U V X Z]
@@ -46,6 +47,15 @@ module RTicker
         Thread.new { entry.determine_spot_contract }
       end
 
+      entries.each do |e|
+        unless e.forward_months.nil?
+          symbol, exchange = e.symbol.split(".")
+          month_symbol = Future::COMMODITY_MONTHS[(Time.now().month + e.forward_months - 1) % 12]
+          year_symbol = (Time.now().year + ((Time.now().month + e.forward_months - 1) / 12.0).floor) % 100
+          e.real_symbol = "#{symbol}#{month_symbol}#{year_symbol}.#{exchange}"
+        end
+      end
+
       if entries.any? {|e| e.real_symbol.nil?}
         #puts "Please wait... determining spot contracts"
         threads = []
@@ -71,7 +81,7 @@ module RTicker
         price  = fields[0]
         change = fields[1]
         last_date = fields[2]
-        return if last_date.nil? or Date.strptime(last_date, '"%m/%d/%Y"') != Date.today
+        return if last_date.nil? #or Date.strptime(last_date, '"%m/%d/%Y"') != Date.today
         if price.to_f != _entry.curr_value and not _entry.curr_value.nil?
           # The price has changed
           _entry.last_changed = Time.now() 
@@ -103,12 +113,13 @@ module RTicker
         month_symbol = Future::COMMODITY_MONTHS[curr_month]
         year_symbol = curr_year % 100 # Only want last two digits of year.
         real_symbol_attempt = "#{symbol}#{month_symbol}#{year_symbol}.#{exchange}"
-        uri = "http://download.finance.yahoo.com/d/quotes.csv?s=%s&f=l1c1va2xj1b4j4dyekjm3m4rr5p5p6s7" % CGI::escape(real_symbol_attempt)
+        uri = "http://download.finance.yahoo.com/d/quotes.csv?s=%s&f=l1c1d1va2xj1b4j4dyekjm3m4rr5p5p6s7" % CGI::escape(real_symbol_attempt)
         response = RTicker::Net.get_response(uri) rescue return
 
         # This contract is only valid if the response doesn't start with
         # 0.00.  A commodity is never worth nothing!
-        unless response =~ /^0.00/
+        last_date = response.split("\n")[0].split(",")[2]
+        if not response =~ /^0.00/ and last_date and last_date != 'N/A' and Date.strptime(last_date, '"%m/%d/%Y"') >= Date.today - 3
           @real_symbol = real_symbol_attempt
           @exp_month = curr_month+1 # Convert from 0-based back to 1-based
           @exp_year = curr_year

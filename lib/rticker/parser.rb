@@ -71,6 +71,15 @@ module RTicker
 
     sign = match[1]
     symbol = match[2]
+
+    if sign == '#' # This is a future
+      submatch = /(.*)\+([0-9]+)$/.match symbol
+      if submatch
+        symbol = submatch[1]
+        forward_months = submatch[2].to_i
+      end
+    end
+
     # Because description is optional, let's make it clear with a nil that no
     # description was provided.
     description = match[3] == "" ? nil : match[3]
@@ -82,7 +91,9 @@ module RTicker
     when "#"
       # An entry starting with a hash is a Future.  A useful mnemonic is to
       # think of the "pound" sign and think of lbs of a commodity.
-      return Future.new(*args)
+      f = Future.new(*args)
+      f.forward_months = forward_months
+      return f
     when "!"
       # An entry starting with an exclamation mark is an option contract.
       return Option.new(*args)

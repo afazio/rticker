@@ -11,7 +11,7 @@ module RTicker
     # So setting no_color effectively turns all of the following variables
     # into empty strings, turning off terminal manipulation.
     hide_cursor = tput "civis" unless no_color
-    show_cursor = tput "cnorm" unless no_color
+    #show_cursor = tput "cnorm" unless no_color
     bold = tput "bold" unless no_color
     unbold = tput "sgr0" unless no_color
     default = tput "sgr0" unless no_color

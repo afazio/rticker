@@ -22,14 +22,14 @@ module RTicker
     def self.get_response (url)
       begin
         return ::Net::HTTP::Proxy(@@proxy_host, @@proxy_port).get(URI.parse url)
-      rescue Timeout::Error => e
+      rescue Timeout::Error
         return ""
       end
     end
 
     def self.detect_system_proxy ()
       require 'rbconfig'
-      os = Config::CONFIG['host_os']
+      os = RbConfig::CONFIG['host_os']
       # Only support mac os x right now
       return detect_system_proxy_macosx() if os.start_with? "darwin"
       return nil

@@ -47,7 +47,7 @@ module RTicker
       begin
         bid = /id="yfs_b00_[^"]*">([^<]*)</.match(response)[1]
         ask = /id="yfs_a00_[^"]*">([^<]*)</.match(response)[1]
-      rescue Exception => e
+      rescue Exception
         # These results aren't available from about 9am to 9:30am.
         # Yahoo's results are often 20-30 minutes behind.
         Thread.current.exit

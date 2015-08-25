@@ -1,7 +1,6 @@
 require 'rticker/entry'
 require 'rticker/net'
 require 'cgi'
-require 'rational'
 require 'date'
 
 module RTicker
@@ -66,7 +65,7 @@ module RTicker
         price  = fields[0]
         change = fields[1]
         last_date = fields[2]
-        return if last_date.nil? or Date.strptime(last_date, '"%m/%d/%Y"') != Date.today
+        return if last_date.nil? or Date.strptime(last_date, '"%m/%d/%Y"') <= Date.today - 3
         if price.to_f != entry.curr_value and not entry.curr_value.nil?
           # The price has changed
           entry.last_changed = Time.now() 
